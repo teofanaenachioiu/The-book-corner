@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_margin">10dp</dimen>
+    <dimen name="text_margin_login">25dp</dimen>
+    <dimen name="text_margin_details">30dp</dimen>
+    <dimen name="margin_top">100dp</dimen>
+</resources>

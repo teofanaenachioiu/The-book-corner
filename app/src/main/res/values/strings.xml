@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Books corner</string>
+    <string name="action_settings">Profile</string>
+    <string name="item_list">My books</string>
+    <string name="item_edit">Item Edit</string>
+    <string name="action_logout">Logout</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >=5 characters</string>
+    <string name="password">Password</string>
+    <string name="action_favorites">favorites</string>
+    <string name="action_search">search</string>
+    <string name="item_details">Item Details</string>
+    <string name="title">Title</string>
+    <string name="author">Author</string>
+    <string name="gene">Gene</string>
+    <string name="action_chart">Chart</string>
+</resources>
