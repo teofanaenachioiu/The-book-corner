@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.firstapp.R
 import com.example.firstapp.core.Api
+import com.example.firstapp.core.ConnectivityReceiver
 import kotlinx.android.synthetic.main.book_list_fragment.*
 import com.example.firstapp.core.TAG;
 
@@ -46,7 +47,7 @@ class BookListFragment : Fragment() {
         setupItemList()
         fab.setOnClickListener {
             Log.v(TAG, "add new item")
-            findNavController().navigate(R.id.item_details_fragment)
+            findNavController().navigate(R.id.item_edit_fragment)
         }
     }
 
@@ -75,15 +76,11 @@ class BookListFragment : Fragment() {
             }
         })
         if (context!!.isConnected) {
-            Log.v(TAG, "no internet connection in book list fragment")
+            Log.v(TAG, "internet connection in book list fragment. Read from server")
             itemListModel.refresh()
-        }
-        else{
-            Log.v(TAG, "internet connection in book list fragment")
+        } else {
+            Log.v(TAG, "no internet connection in book list fragment. Read from local database")
             itemListAdapter.items = itemListModel.items.value!!
         }
-
     }
-
-
 }

@@ -1,5 +1,7 @@
 package com.example.firstapp.book_corner.item
 
+import android.content.Context
+import android.net.ConnectivityManager
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.firstapp.R
 import com.example.firstapp.auth.data.AuthRepository
 import com.example.firstapp.book_corner.data.Book
+import com.example.firstapp.core.ConnectivityReceiver
 import kotlinx.android.synthetic.main.book_edit_fragment.*
 import com.example.firstapp.core.TAG;
 import kotlinx.android.synthetic.main.book_edit_fragment.fab
@@ -27,6 +30,14 @@ class BookEditFragment : Fragment() {
     private lateinit var viewModel: BookEditViewModel
     private var itemId: String? = null
     private var item: Book? = null
+
+
+    val Context.isConnected: Boolean
+        get() {
+            return (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+                .activeNetworkInfo?.isConnected == true
+        }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +68,13 @@ class BookEditFragment : Fragment() {
                 book.author = book_author.text.toString()
                 book.gene = book_gene.text.toString()
                 book.user = AuthRepository.user!!.username
-                viewModel.saveOrUpdateItem(book)
+
+                if(context!!.isConnected){
+                    viewModel.saveOrUpdateItem(book)
+                }
+                else{
+                    Toast.makeText(this.context?.applicationContext, "No internet", Toast.LENGTH_LONG).show()
+                }
             }
         }
 
@@ -101,7 +118,5 @@ class BookEditFragment : Fragment() {
                 }
             })
         }
-
     }
-
 }

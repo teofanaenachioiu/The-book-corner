@@ -1,5 +1,7 @@
 package com.example.firstapp.book_corner.item
 
+import android.content.Context
+import android.net.ConnectivityManager
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 
 import com.example.firstapp.R
 import com.example.firstapp.book_corner.data.Book
+import com.example.firstapp.core.ConnectivityReceiver
 import com.example.firstapp.core.TAG
 import kotlinx.android.synthetic.main.book_details_fragment.*
 
@@ -25,6 +28,7 @@ class BookDetailsFragment : Fragment() {
     private lateinit var viewModel: BookDetailsViewModel
     private var itemId: String? = null
     private var item: Book? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
