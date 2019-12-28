@@ -4,11 +4,10 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.content.Context
+import android.app.AlertDialog
 import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
-import android.net.ConnectivityManager
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
@@ -16,8 +15,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TableLayout
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -26,11 +27,8 @@ import com.example.firstapp.MainActivity
 
 import com.example.firstapp.R
 import com.example.firstapp.book_corner.data.Book
-import com.example.firstapp.core.ConnectivityReceiver
 import com.example.firstapp.core.TAG
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.book_details_fragment.*
-import kotlinx.coroutines.NonCancellable.start
 
 class BookDetailsFragment : Fragment() {
     companion object {
@@ -42,6 +40,12 @@ class BookDetailsFragment : Fragment() {
     private var item: Book? = null
 
 
+    //////////////////////////////////// FAB //////////////////////////////////////
+    var isOpen = false;
+    ///////////////////////////////////////////////////////////////////////////////////
+
+
+    /////////////////////////////////// IMAGE /////////////////////////////////////////
     // Hold a reference to the current animator,
     // so that it can be canceled mid-way.
     private var currentAnimator: Animator? = null
@@ -50,7 +54,7 @@ class BookDetailsFragment : Fragment() {
     // duration is ideal for subtle animations or animations that occur
     // very frequently.
     private var shortAnimationDuration: Int = 0
-
+    ///////////////////////////////////////////////////////////////////////////////////
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,15 +78,46 @@ class BookDetailsFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(BookDetailsViewModel::class.java)
         Log.v(TAG, "onActivityCreated")
         setupViewModel()
-        fab.setOnClickListener {
+
+        /////////////////////////////// FAB //////////////////////////
+
+        val fab_close = AnimationUtils.loadAnimation(context?.applicationContext, R.anim.fab_close);
+        val fab_open = AnimationUtils.loadAnimation(context?.applicationContext, R.anim.fab_open);
+
+        fabb.setOnClickListener {
+            isOpen = if (isOpen) {
+
+                fab_edit.startAnimation(fab_close);
+                fab_delete.startAnimation(fab_close);
+                fab_edit.isClickable = false;
+                fab_delete.isClickable = false;
+                false;
+            } else {
+                fab_edit.startAnimation(fab_open);
+                fab_delete.startAnimation(fab_open);
+                fab_edit.isClickable = true;
+                fab_delete.isClickable = true;
+                true;
+            }
+
+        }
+
+        fab_edit.setOnClickListener {
             Log.v(TAG, "edit item")
             findNavController().navigate(R.id.item_edit_fragment, Bundle().apply {
                 putString(BookEditFragment.ITEM_ID, itemId)
             })
         }
-        thumb_button_1.setOnClickListener {
-            zoomImageFromThumb(thumb_button_1, tableLayoutDetails, fab, R.drawable.book)
+        fab_delete.setOnClickListener {
+            Log.v(TAG, "delete item")
+
+            deleteItem()
         }
+
+        thumb_button_1.setOnClickListener {
+            zoomImageFromThumb(thumb_button_1, tableLayoutDetails, fabs, R.drawable.book)
+        }
+
         shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
     }
 
@@ -111,7 +146,7 @@ class BookDetailsFragment : Fragment() {
         val id = itemId
 
         if (id == null) {
-            item = Book("","","","","")
+            item = Book("", "", "", "", "")
         } else {
             viewModel.getItemById(id).observe(this, Observer {
                 Log.v(TAG, "update items")
@@ -126,10 +161,12 @@ class BookDetailsFragment : Fragment() {
         }
     }
 
+
+    //////////////////////////////////////// IMAGE ANIMATION ///////////////////////////
     private fun zoomImageFromThumb(
         thumbView: View,
         tableLayout: TableLayout,
-        fab: FloatingActionButton,
+        fabs: RelativeLayout,
         imageResId: Int
     ) {
         if (activity is MainActivity) {
@@ -188,8 +225,8 @@ class BookDetailsFragment : Fragment() {
             // thumbnail.
             thumbView.alpha = 0f
             tableLayout.alpha = 0f
-            fab.alpha = 0f;
-            fab.isEnabled = false;
+            fabs.alpha = 0f;
+            fabs.isEnabled = false;
             expandedImageView.visibility = View.VISIBLE
 
             // Set the pivot point for SCALE_X and SCALE_Y transformations
@@ -262,8 +299,8 @@ class BookDetailsFragment : Fragment() {
                         override fun onAnimationEnd(animation: Animator) {
                             thumbView.alpha = 1f
                             tableLayout.alpha = 1f
-                            fab.alpha = 1f;
-                            fab.isEnabled = true;
+                            fabs.alpha = 1f;
+                            fabs.isEnabled = true;
                             expandedImageView.visibility = View.GONE
                             currentAnimator = null
                         }
@@ -271,8 +308,8 @@ class BookDetailsFragment : Fragment() {
                         override fun onAnimationCancel(animation: Animator) {
                             thumbView.alpha = 1f
                             tableLayout.alpha = 1f
-                            fab.alpha = 1f;
-                            fab.isEnabled = true;
+                            fabs.alpha = 1f;
+                            fabs.isEnabled = true;
                             expandedImageView.visibility = View.GONE
                             currentAnimator = null
                         }
@@ -281,7 +318,65 @@ class BookDetailsFragment : Fragment() {
                 }
             }
         }
+        ///////////////////////////////////////////////////////////////////////////////////
 
+    }
+
+    private fun deleteItem(): Boolean {
+
+        Log.v(TAG, "delete item item $id")
+
+        val builder = AlertDialog.Builder(context)
+
+        // Set the alert dialog title
+        builder.setTitle("Remove item")
+
+        // Display a message on alert dialog
+        builder.setMessage("Do you want to remove this book?")
+
+        // Set a positive button and its click listener on alert dialog
+        builder.setPositiveButton("YES") { dialog, which ->
+            // Do something when user press the positive button
+            Toast.makeText(
+                context,
+                "Book has been removed.",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            // Change the app background color
+            Log.v(TAG, "notify delete item")
+
+            viewModel.deleteItem(item!!._id)
+//            findNavController().popBackStack()
+        }
+
+
+        // Display a negative button on alert dialog
+        builder.setNegativeButton("No") { dialog, which ->
+            Toast.makeText(
+                context,
+                "You are not agree.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+
+        // Display a neutral button on alert dialog
+        builder.setNeutralButton("Cancel") { _, _ ->
+            Toast.makeText(
+                context,
+                "You cancelled the dialog.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        // Finally, make the alert dialog using builder
+        val dialog: AlertDialog = builder.create()
+
+        // Display the alert dialog on app interface
+        dialog.show()
+
+        return true;
     }
 
 }

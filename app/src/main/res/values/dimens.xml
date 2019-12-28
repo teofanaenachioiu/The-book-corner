@@ -1,7 +1,15 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_margin_delete">86dp</dimen>
     <dimen name="text_margin">10dp</dimen>
     <dimen name="text_margin_login">25dp</dimen>
     <dimen name="text_margin_details">30dp</dimen>
     <dimen name="margin_top">100dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="cardCornerRadius">4dp</dimen>
+    <dimen name="cardElevation">4dp</dimen>
+    <dimen name="cardview_horizontal_padding">6dp</dimen>
+    <dimen name="cardview_vertical_padding">2dp</dimen>
+
 </resources>

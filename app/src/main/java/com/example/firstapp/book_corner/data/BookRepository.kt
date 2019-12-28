@@ -64,10 +64,15 @@ class BookRepository(private val itemDao: ItemDao) {
     suspend fun delete(id: String): Result<Boolean> {
         return try {
             val isDelete = BookApi.service.delete(id)
-            if (isDelete) {
+
+            if(isDelete){
                 itemDao.delete(id);
+                Result.Success(true)
             }
-            Result.Success(isDelete)
+            else{
+                Result.Success(false)
+            }
+
         } catch (e: Exception) {
             Result.Error(e)
         }

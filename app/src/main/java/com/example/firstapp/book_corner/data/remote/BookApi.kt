@@ -3,10 +3,6 @@ package com.example.firstapp.book_corner.data.remote
 import com.example.firstapp.book_corner.data.Book
 import com.example.firstapp.book_corner.data.BookToSave
 import com.example.firstapp.core.Api
-import com.google.gson.GsonBuilder
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
 
@@ -29,8 +25,8 @@ object BookApi {
         @PUT("/api/book")
         suspend fun update(@Body item: Book): Book
 
-        @DELETE("/api/book/{_id}")
-        suspend fun delete(id: String): Boolean
+        @DELETE("/api/book/{id}")
+        suspend fun delete(@Path("id") id: String): Boolean
     }
 
     val service: Service = Api.retrofit.create(
