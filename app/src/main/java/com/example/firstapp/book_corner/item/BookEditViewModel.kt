@@ -19,8 +19,6 @@ class BookEditViewModel(application: Application) : AndroidViewModel(application
     val fetchingError: LiveData<Exception> = mutableException
     val completed: LiveData<Boolean> = mutableCompleted
 
-
-
     val itemRepository: BookRepository
 
     init {

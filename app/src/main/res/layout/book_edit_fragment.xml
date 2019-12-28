@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".book_corner.item.BookEditFragment"
-    android:id="@+id/rootLayout"
-    >
+    tools:context=".book_corner.item.BookEditFragment">
 
     <ProgressBar
         android:id="@+id/progresse"
@@ -16,7 +14,7 @@
         android:visibility="gone" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/image_view_edit"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="@dimen/margin_top"
@@ -25,12 +23,13 @@
 
 
     <TableLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_marginHorizontal="50dp"
         android:layout_marginTop="150dp"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:shrinkColumns="1">
 
         <TableRow
             android:layout_width="match_parent"
@@ -49,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Title"
-                android:textStyle="bold" />
+                />
         </TableRow>
 
         <TableRow
@@ -69,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Author"
-                android:textStyle="bold" />
+                />
         </TableRow>
 
         <TableRow
@@ -83,13 +82,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
                 android:text="@string/gene" />
-
-            <EditText
-                android:id="@+id/book_gene"
+            <Spinner
+                android:id="@+id/spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Gene"
-                android:textStyle="bold" />
+                />
         </TableRow>
     </TableLayout>
 

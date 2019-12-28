@@ -18,4 +18,19 @@
     <string name="action_chart">Chart</string>
     <string name="items_chart">Items chart</string>
     <string name="description_zoom_touch_close">Description zoom touch close</string>
+
+    <string-array name="bookgene">
+        <item>Memories</item>
+        <item>Historical Fiction</item>
+        <item>Mystery</item>
+        <item>Young Adult Fiction</item>
+        <item>Classical Literature</item>
+        <item>Religion</item>
+        <item>Fantasy</item>
+        <item>Children fiction</item>
+        <item>Psychology</item>
+        <item>Thriller</item>
+        <item>Poems</item>
+        <item>Science</item>
+    </string-array>
 </resources>

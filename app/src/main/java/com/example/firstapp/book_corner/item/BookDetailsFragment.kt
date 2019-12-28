@@ -120,7 +120,7 @@ class BookDetailsFragment : Fragment() {
                     item = it
                     book_title.setText(it.title)
                     book_author.setText(it.author)
-                    book_gene.setText(it.author)
+                    book_gene.setText(it.gene)
                 }
             })
         }
