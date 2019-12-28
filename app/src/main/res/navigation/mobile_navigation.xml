@@ -17,11 +17,11 @@
         android:label="@string/item_list"
         tools:layout="@layout/book_list_fragment" />
 
-<!--    <fragment-->
-<!--        android:id="@+id/chart_fragment"-->
-<!--        android:name="com.example.firstapp.book_corner.chart.ChartFragment"-->
-<!--        android:label="@string/items_chart"-->
-<!--        tools:layout="@layout/chart_fragment" />-->
+    <fragment
+        android:id="@+id/chart_fragment"
+        android:name="com.example.firstapp.book_corner.chart.ChartFragment"
+        android:label="@string/items_chart"
+        tools:layout="@layout/chart_fragment" />
 
     <fragment
         android:id="@+id/item_details_fragment"

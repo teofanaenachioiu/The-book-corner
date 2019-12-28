@@ -47,7 +47,6 @@
                 android:id="@+id/book_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Title"
                 />
         </TableRow>
 
@@ -67,7 +66,6 @@
                 android:id="@+id/book_author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Author"
                 />
         </TableRow>
 

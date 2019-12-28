@@ -43,7 +43,8 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
             AppBarConfiguration.Builder(
                 R.id.login_fragment,
                 R.id.item_list_fragment,
-                R.id.item_edit_fragment)
+                R.id.item_edit_fragment,
+                R.id.chart_fragment)
                 .build()
         val navController: NavController = findNavController(R.id.nav_host_fragment)
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -56,11 +57,12 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_chart -> {
+            findNavController(R.id.nav_host_fragment).navigate(R.id.chart_fragment)
             true
         }
-
         R.id.action_logout -> {
-            true
+            findNavController(R.id.nav_host_fragment).navigate(R.id.login_fragment)
+            true;
         }
         else -> {
             // If we got here, the user's action was not recognized.
