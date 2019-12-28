@@ -31,6 +31,10 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         )
 
+        // to enable back button from toolbar
+        supportActionBar?.setDisplayShowHomeEnabled(true);
+        supportActionBar?.setDisplayHomeAsUpEnabled(true);
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
@@ -63,6 +67,12 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
+    }
+
+    // for back button from toolbar
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     private fun showMessage(isConnected: Boolean) {
