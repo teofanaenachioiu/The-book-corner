@@ -1,5 +1,8 @@
 package com.example.firstapp.book_corner.items
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -15,12 +19,21 @@ import com.example.firstapp.R
 import com.example.firstapp.core.Api
 import kotlinx.android.synthetic.main.book_list_fragment.*
 import com.example.firstapp.core.TAG;
+
 class BookListFragment : Fragment() {
     private lateinit var itemListAdapter: BookListAdapter
     private lateinit var itemListModel: BookListViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    val Context.isConnected: Boolean
+        get() {
+            return (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+                .activeNetworkInfo?.isConnected == true
+        }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         Log.v(TAG, "onCreateView")
         return inflater.inflate(R.layout.book_list_fragment, container, false)
     }
@@ -40,7 +53,9 @@ class BookListFragment : Fragment() {
     private fun setupItemList() {
         itemListAdapter = BookListAdapter(this)
         item_list.adapter = itemListAdapter
+
         itemListModel = ViewModelProviders.of(this).get(BookListViewModel::class.java)
+
         itemListModel.items.observe(this, Observer { items ->
             Log.v(TAG, "update items")
             itemListAdapter.items = items
@@ -59,7 +74,16 @@ class BookListFragment : Fragment() {
                 }
             }
         })
-        itemListModel.loadItems()
-        Toast.makeText(this.context?.applicationContext, Api.emailHolder.email, Toast.LENGTH_LONG).show()
+        if (context!!.isConnected) {
+            Log.v(TAG, "no internet connection in book list fragment")
+            itemListModel.refresh()
+        }
+        else{
+            Log.v(TAG, "internet connection in book list fragment")
+            itemListAdapter.items = itemListModel.items.value!!
+        }
+
     }
+
+
 }

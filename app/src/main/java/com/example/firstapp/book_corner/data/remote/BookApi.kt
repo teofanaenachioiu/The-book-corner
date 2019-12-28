@@ -1,7 +1,7 @@
 package com.example.firstapp.book_corner.data.remote
 
-import com.example.firstapp.book_corner.data.PagedItems
 import com.example.firstapp.book_corner.data.Book
+import com.example.firstapp.book_corner.data.BookToSave
 import com.example.firstapp.core.Api
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -23,11 +23,14 @@ object BookApi {
 
         @Headers("Content-Type: application/json")
         @POST("/api/book")
-        suspend fun create(@Body item: Book): Book
+        suspend fun create(@Body item: BookToSave): Book
 
         @Headers("Content-Type: application/json")
-        @PUT("/api/book/{_id}")
-        suspend fun update(@Path("_id") itemId: String, @Body item: Book): Book
+        @PUT("/api/book")
+        suspend fun update(@Body item: Book): Book
+
+        @DELETE("/api/book/{_id}")
+        suspend fun delete(id: String): Boolean
     }
 
     val service: Service = Api.retrofit.create(

@@ -11,8 +11,12 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.firstapp.R
+import com.example.firstapp.auth.data.AuthRepository
+import com.example.firstapp.book_corner.data.Book
 import kotlinx.android.synthetic.main.book_edit_fragment.*
 import com.example.firstapp.core.TAG;
+import kotlinx.android.synthetic.main.book_edit_fragment.fab
+import kotlinx.android.synthetic.main.book_list_fragment.*
 
 class BookEditFragment : Fragment() {
 
@@ -22,6 +26,7 @@ class BookEditFragment : Fragment() {
 
     private lateinit var viewModel: BookEditViewModel
     private var itemId: String? = null
+    private var item: Book? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,21 +51,20 @@ class BookEditFragment : Fragment() {
         setupViewModel()
         fab.setOnClickListener {
             Log.v(TAG, "save item")
-            viewModel.saveOrUpdateItem(book_title.text.toString(),
-                book_author.text.toString(),
-                book_gene.text.toString())
+            val book = item
+            if (book != null) {
+                book.title = book_title.text.toString()
+                book.author = book_author.text.toString()
+                book.gene = book_gene.text.toString()
+                book.user = AuthRepository.user!!.username
+                viewModel.saveOrUpdateItem(book)
+            }
         }
 
     }
 
     private fun setupViewModel() {
         viewModel = ViewModelProviders.of(this).get(BookEditViewModel::class.java)
-        viewModel.item.observe(this, Observer { item ->
-            Log.v(TAG, "update items")
-            book_title.setText( item.title);
-            book_author.setText( item.author);
-            book_gene.setText( item.gene);
-        })
         viewModel.fetching.observe(this, Observer { fetching ->
             Log.v(TAG, "update fetching")
             progresse.visibility = if (fetching) View.VISIBLE else View.GONE
@@ -78,13 +82,26 @@ class BookEditFragment : Fragment() {
         viewModel.completed.observe(this, Observer { completed ->
             if (completed) {
                 Log.v(TAG, "completed, navigate back")
-                findNavController().navigateUp()
+                findNavController().popBackStack()
             }
         })
         val id = itemId
-        if (id != null) {
-            viewModel.loadItem(id)
+
+        if (id == null) {
+            item = Book("","","","","")
+        } else {
+            viewModel.getItemById(id).observe(this, Observer {
+                Log.v(TAG, "update items")
+
+                if (it != null) {
+                    item = it
+                    book_title.setText(it.title)
+                    book_author.setText(it.author)
+                    book_gene.setText(it.author)
+                }
+            })
         }
+
     }
 
 }

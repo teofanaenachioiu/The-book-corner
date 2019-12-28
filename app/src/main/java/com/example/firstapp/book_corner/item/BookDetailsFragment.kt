@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 
 import com.example.firstapp.R
+import com.example.firstapp.book_corner.data.Book
 import com.example.firstapp.core.TAG
 import kotlinx.android.synthetic.main.book_details_fragment.*
 
@@ -23,6 +24,7 @@ class BookDetailsFragment : Fragment() {
 
     private lateinit var viewModel: BookDetailsViewModel
     private var itemId: String? = null
+    private var item: Book? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,12 +58,6 @@ class BookDetailsFragment : Fragment() {
 
     private fun setupViewModel() {
         viewModel = ViewModelProviders.of(this).get(BookDetailsViewModel::class.java)
-        viewModel.book.observe(this, Observer { item ->
-            Log.v(TAG, "update items")
-            book_title.text = item.title
-            book_author.text = item.author
-            book_gene.text = item.gene
-        })
         viewModel.fetching.observe(this, Observer { fetching ->
             Log.v(TAG, "update fetching")
             progresse.visibility = if (fetching) View.VISIBLE else View.GONE
@@ -79,12 +75,24 @@ class BookDetailsFragment : Fragment() {
         viewModel.completed.observe(this, Observer { completed ->
             if (completed) {
                 Log.v(TAG, "completed, navigate back")
-                findNavController().navigateUp()
+                findNavController().popBackStack()
             }
         })
         val id = itemId
-        if (id != null) {
-            viewModel.loadItem(id)
+
+        if (id == null) {
+            item = Book("","","","","")
+        } else {
+            viewModel.getItemById(id).observe(this, Observer {
+                Log.v(TAG, "update items")
+
+                if (it != null) {
+                    item = it
+                    book_title.setText(it.title)
+                    book_author.setText(it.author)
+                    book_gene.setText(it.author)
+                }
+            })
         }
     }
 
