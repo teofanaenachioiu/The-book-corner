@@ -79,6 +79,7 @@ class BookListFragment : Fragment() {
             Log.v(TAG, "internet connection in book list fragment. Read from server")
             itemListModel.refresh()
         } else {
+            Toast.makeText(context, "Read from local database", Toast.LENGTH_SHORT).show()
             Log.v(TAG, "no internet connection in book list fragment. Read from local database")
             itemListAdapter.items = itemListModel.items.value!!
         }
