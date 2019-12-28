@@ -1,5 +1,7 @@
 package com.example.firstapp
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -12,20 +14,30 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
 import com.example.firstapp.core.*;
+import com.google.android.material.snackbar.Snackbar
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityReceiverListener {
+    private var mSnackBar: Snackbar? = null
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v(TAG, "onCreate")
+
+        registerReceiver(
+            ConnectivityReceiver(),
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        )
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         appBarConfiguration =
-            AppBarConfiguration.Builder(R.id.login_fragment,
+            AppBarConfiguration.Builder(
+                R.id.login_fragment,
                 R.id.item_list_fragment,
                 R.id.item_edit_fragment)
                 .build()
@@ -51,5 +63,47 @@ class MainActivity : AppCompatActivity() {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showMessage(isConnected: Boolean) {
+
+
+        if (!isConnected) {
+
+            if (mSnackBar != null) {
+                mSnackBar?.dismiss()
+            }
+            val messageToUser = "You are offline now." //TODO
+
+            mSnackBar = Snackbar.make(
+                findViewById(R.id.rootLayout),
+                messageToUser,
+                Snackbar.LENGTH_LONG
+            ) //Assume "rootLayout" as the root layout of every activity.
+            mSnackBar?.duration = 3000
+            mSnackBar?.show()
+        } else {
+            if (mSnackBar != null) {
+                mSnackBar?.dismiss()
+            }
+            val messageToUser = "You are online now." //TODO
+
+            mSnackBar = Snackbar.make(
+                findViewById(R.id.rootLayout),
+                messageToUser,
+                Snackbar.LENGTH_LONG
+            ) //Assume "rootLayout" as the root layout of every activity.
+            mSnackBar?.duration = 3000
+            mSnackBar?.show()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ConnectivityReceiver.connectivityReceiverListener = this
+    }
+
+    override fun onNetworkConnectionChanged(isConnected: Boolean) {
+        showMessage(isConnected)
     }
 }
