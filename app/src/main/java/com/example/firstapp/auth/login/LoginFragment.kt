@@ -1,13 +1,12 @@
 package com.example.firstapp.auth.login
 
-import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,14 +14,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.example.firstapp.R
+import com.example.firstapp.core.ConnectivityReceiver
+import com.example.firstapp.core.Result
 import kotlinx.android.synthetic.main.login_fragment.*
 
-import com.example.firstapp.R
-import com.example.firstapp.auth.data.TokenHolder
-import com.example.firstapp.core.Result
 
 class LoginFragment : Fragment() {
-
     private lateinit var viewModel: LoginViewModel
 
     override fun onCreateView(
@@ -59,7 +57,13 @@ class LoginFragment : Fragment() {
             if (loginResult is Result.Success<*>) {
                 findNavController().navigate(R.id.item_list_fragment)
             } else if (loginResult is Result.Error) {
-                error_text.text = "Login error ${loginResult.exception.message}"
+                if (loginResult.exception.message.equals("HTTP 400 Bad Request")) {
+                    error_text.text = "Wrong credentials"
+                } else if (loginResult.exception.message!!.contains("Failed to connect to /")) {
+                    showToast("No internet")
+                } else {
+                    error_text.text = "Login error ${loginResult.exception.message}"
+                }
                 error_text.visibility = View.VISIBLE
             }
         })
@@ -81,6 +85,10 @@ class LoginFragment : Fragment() {
             viewModel.login(username.text.toString(), password.text.toString())
         }
     }
+
+    private fun showToast(text: String) {
+        Toast.makeText(this.context?.applicationContext, text, Toast.LENGTH_LONG).show()
+    }
 }
 
 fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
@@ -88,6 +96,7 @@ fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
         override fun afterTextChanged(editable: Editable?) {
             afterTextChanged.invoke(editable.toString())
         }
+
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
     })

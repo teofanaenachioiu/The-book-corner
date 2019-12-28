@@ -1,15 +1,16 @@
 package com.example.firstapp.core
 
+import com.example.firstapp.auth.data.EmailHolder
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.*
 
 object Api {
     private const val URL = "http://192.168.0.104:3000/"
 
     val tokenInterceptor = TokenInterceptor()
+    var emailHolder = EmailHolder(null)
 
     private val client: OkHttpClient = OkHttpClient.Builder().apply {
         this.addInterceptor(tokenInterceptor)

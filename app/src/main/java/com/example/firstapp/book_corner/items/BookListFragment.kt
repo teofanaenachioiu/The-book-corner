@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.firstapp.R
+import com.example.firstapp.core.Api
 import kotlinx.android.synthetic.main.book_list_fragment.*
 import com.example.firstapp.core.TAG;
 class BookListFragment : Fragment() {
@@ -59,5 +60,6 @@ class BookListFragment : Fragment() {
             }
         })
         itemListModel.loadItems()
+        Toast.makeText(this.context?.applicationContext, Api.emailHolder.email, Toast.LENGTH_LONG).show()
     }
 }
