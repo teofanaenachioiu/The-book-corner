@@ -6,8 +6,8 @@
     <string name="action_logout">Logout</string>
     <string name="login">Login</string>
     <string name="username">Username</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >=5 characters</string>
+    <string name="invalid_username">Not a valid email</string>
+    <string name="invalid_password">Password must have at least 5 characters</string>
     <string name="password">Password</string>
     <string name="action_favorites">favorites</string>
     <string name="action_search">search</string>
@@ -16,4 +16,6 @@
     <string name="author">Author</string>
     <string name="gene">Gene</string>
     <string name="action_chart">Chart</string>
+    <string name="items_chart">Items chart</string>
+    <string name="description_zoom_touch_close">Description zoom touch close</string>
 </resources>

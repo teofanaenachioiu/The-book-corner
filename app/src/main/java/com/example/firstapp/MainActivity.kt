@@ -43,9 +43,6 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        R.id.action_search -> {
-            true
-        }
         R.id.action_logout -> {
             true
         }

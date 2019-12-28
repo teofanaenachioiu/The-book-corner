@@ -9,14 +9,8 @@
         android:icon="@drawable/baseline_pie_chart_white_48dp"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_search"
-        android:orderInCategory="101"
-        android:title="@string/action_search"
-        android:icon="@drawable/baseline_search_white_48dp"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/action_logout"
-        android:orderInCategory="102"
+        android:orderInCategory="101"
         android:title="@string/action_logout"
         app:showAsAction="never" />
 </menu>
