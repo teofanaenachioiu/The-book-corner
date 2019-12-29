@@ -1,32 +1,34 @@
 package com.example.firstapp.book_corner.item
 
-import android.app.Activity.RESULT_OK
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.ConnectivityManager
-import androidx.lifecycle.ViewModelProviders
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.content.FileProvider
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.firstapp.MainActivity
 import com.example.firstapp.R
 import com.example.firstapp.book_corner.data.Book
+import com.example.firstapp.core.TAG
 import kotlinx.android.synthetic.main.book_edit_fragment.*
-import com.example.firstapp.core.TAG;
-import kotlinx.android.synthetic.main.book_edit_fragment.fab
+import kotlinx.io.IOException
+import java.io.File
 
 
 class BookEditFragment : Fragment() {
-
     companion object {
         const val ITEM_ID = "ITEM_ID"
     }
@@ -34,7 +36,7 @@ class BookEditFragment : Fragment() {
     private lateinit var viewModel: BookEditViewModel
     private var itemId: String? = null
     private var item: Book? = null
-    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_TAKE_PHOTO = 1
 
     val Context.isConnected: Boolean
         get() {
@@ -52,8 +54,10 @@ class BookEditFragment : Fragment() {
         }
     }
 
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         Log.v(TAG, "onCreateView")
@@ -62,12 +66,6 @@ class BookEditFragment : Fragment() {
         return inflater.inflate(R.layout.book_edit_fragment, container, false)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            val imageBitmap = data?.extras?.get("data") as Bitmap
-            image_view_edit.setImageBitmap(imageBitmap)
-        }
-    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -98,8 +96,11 @@ class BookEditFragment : Fragment() {
         }
 
         image_view_edit.setOnClickListener {
-            dispatchTakePictureIntent();
+            takePicture();
         }
+
+
+       setAvatar();
 
         // set data to
         val booksgene = resources.getStringArray(R.array.bookgene)
@@ -108,11 +109,22 @@ class BookEditFragment : Fragment() {
         if (spinner != null && activity != null) {
             val adapter = ArrayAdapter(
                 activity!!.applicationContext,
-                android.R.layout.simple_spinner_item, booksgene
+                android.R.layout.simple_spinner_item,
+                booksgene
             )
             spinner.adapter = adapter
         }
+    }
 
+    private fun setAvatar(){
+        val path = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.absolutePath
+
+        val pathToImg = "$path/$itemId.jpg"
+
+        val file = File(pathToImg)
+        if (file.exists()) {
+            image_view_edit.setImageURI(Uri.parse(pathToImg))
+        }
     }
 
     private fun toolbarSetup() {
@@ -171,13 +183,47 @@ class BookEditFragment : Fragment() {
         }
     }
 
-    private fun dispatchTakePictureIntent() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            activity?.packageManager?.let {
-                takePictureIntent.resolveActivity(it)?.also {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-                }
+
+    ////////////////////////////////// CAMERA ////////////////////////////////////////////
+
+    private fun takePicture() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(context!!.packageManager) != null) {
+            var photoFile: File? = null
+
+            try {
+                photoFile = createImageFile()
+            } catch (e: IOException) {
             }
+
+            if (photoFile != null) {
+                val photoUri = FileProvider.getUriForFile(
+                    context!!,
+                    "com.example.firstapp.fileprovider",
+                    photoFile
+                )
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                startActivityForResult(intent, REQUEST_TAKE_PHOTO)
+            }
+        }
+    }
+
+    lateinit var photoPath: String
+
+    private fun createImageFile(): File? {
+        val fileName = itemId
+        val storageDir = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val image = File(storageDir, "$fileName.jpg")
+        photoPath = image.absolutePath
+        Log.v(TAG, "Path TRUE: $photoPath")
+        return image
+    }
+
+    //    /storage/emulated/0/Android/data/com.example.firstapp/files/Pictures/MyPicture3928423606804540189.jpg
+//    /storage/emulated/0/Android/data/com.example.firstapp/files/Pictures/MyPicture.jpg
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+            image_view_edit.setImageURI(Uri.parse(photoPath))
         }
     }
 }

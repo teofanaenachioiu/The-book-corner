@@ -8,8 +8,10 @@ import android.app.AlertDialog
 import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
+import android.net.Uri
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -29,6 +31,11 @@ import com.example.firstapp.R
 import com.example.firstapp.book_corner.data.Book
 import com.example.firstapp.core.TAG
 import kotlinx.android.synthetic.main.book_details_fragment.*
+import kotlinx.android.synthetic.main.book_details_fragment.book_author
+import kotlinx.android.synthetic.main.book_details_fragment.book_title
+import kotlinx.android.synthetic.main.book_details_fragment.progresse
+import kotlinx.android.synthetic.main.book_edit_fragment.*
+import java.io.File
 
 class BookDetailsFragment : Fragment() {
     companion object {
@@ -118,6 +125,8 @@ class BookDetailsFragment : Fragment() {
             zoomImageFromThumb(thumb_button_1, tableLayoutDetails, fabs, R.drawable.book)
         }
 
+        setAvatar()
+
         shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
     }
 
@@ -158,6 +167,19 @@ class BookDetailsFragment : Fragment() {
                     book_gene.setText(it.gene)
                 }
             })
+        }
+    }
+
+
+    private fun setAvatar(){
+        val path = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.absolutePath
+
+        val pathToImg = "$path/$itemId.jpg"
+
+        val file = File(pathToImg)
+        if (file.exists()) {
+            expanded_image.setImageURI(Uri.parse(pathToImg))
+            thumb_button_1.setImageURI(Uri.parse(pathToImg))
         }
     }
 

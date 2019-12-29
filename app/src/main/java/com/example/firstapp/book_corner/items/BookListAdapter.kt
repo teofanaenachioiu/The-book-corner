@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.book_list_row.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.firstapp.R
 import com.example.firstapp.book_corner.data.Book
 import com.example.firstapp.book_corner.item.BookDetailsFragment
+import kotlinx.android.synthetic.main.book_list_row.view.*
 
 class BookListAdapter(private val fragment: Fragment) :
     RecyclerView.Adapter<BookListAdapter.ViewHolder>() {
@@ -48,6 +48,7 @@ class BookListAdapter(private val fragment: Fragment) :
         holder.itemView.tag = item
         holder.itemView.setOnClickListener(onItemClick)
     }
+
 
     override fun getItemCount() = items.size
 
