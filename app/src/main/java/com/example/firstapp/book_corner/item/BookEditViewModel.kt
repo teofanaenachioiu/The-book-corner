@@ -42,8 +42,8 @@ class BookEditViewModel(application: Application) : AndroidViewModel(application
             result = if (item._id.isNotEmpty()) {
                 itemRepository.update(item)
             } else {
-                val itemtosave = BookToSave(item.title, item.author, item.gene, item.user)
-                itemRepository.save(itemtosave)
+                val itemToSave = BookToSave(item.title, item.author, item.gene, item.user)
+                itemRepository.save(itemToSave)
             }
             when (result) {
                 is Result.Success -> {

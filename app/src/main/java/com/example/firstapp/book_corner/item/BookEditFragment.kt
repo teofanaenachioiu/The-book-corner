@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.firstapp.MainActivity
 import com.example.firstapp.R
+import com.example.firstapp.auth.data.AuthRepository
 import com.example.firstapp.book_corner.data.Book
 import com.example.firstapp.core.TAG
 import kotlinx.android.synthetic.main.book_edit_fragment.*
@@ -34,10 +35,11 @@ class BookEditFragment : Fragment() {
     }
 
     private lateinit var viewModel: BookEditViewModel
+    private lateinit var photoPath: String
     private var itemId: String? = null
     private var item: Book? = null
-    private val REQUEST_TAKE_PHOTO = 1
 
+    // we use this property to check Internet connection
     val Context.isConnected: Boolean
         get() {
             return (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
@@ -61,8 +63,10 @@ class BookEditFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.v(TAG, "onCreateView")
+
         toolbarSetup();
         setHasOptionsMenu(true);
+
         return inflater.inflate(R.layout.book_edit_fragment, container, false)
     }
 
@@ -80,8 +84,11 @@ class BookEditFragment : Fragment() {
                 book.title = book_title.text.toString()
                 book.author = book_author.text.toString()
                 book.gene = spinner.selectedItem.toString()
-                book.user = "test"
-//                book.user = AuthRepository.user!!.username
+                book.user = "default_user"
+
+                if (AuthRepository.user != null) {
+                    book.user = AuthRepository.user!!.username
+                }
 
                 if (context!!.isConnected) {
                     viewModel.saveOrUpdateItem(book)
@@ -99,24 +106,27 @@ class BookEditFragment : Fragment() {
             takePicture();
         }
 
+        setAvatar();
 
-       setAvatar();
+        setDataInSpinner()
+    }
 
-        // set data to
-        val booksgene = resources.getStringArray(R.array.bookgene)
 
-        // access the spinner
+    // access the spinner
+    private fun setDataInSpinner() {
         if (spinner != null && activity != null) {
             val adapter = ArrayAdapter(
                 activity!!.applicationContext,
                 android.R.layout.simple_spinner_item,
-                booksgene
+                resources.getStringArray(R.array.bookgene)
             )
             spinner.adapter = adapter
         }
     }
 
-    private fun setAvatar(){
+
+    // set URI to ImageView
+    private fun setAvatar() {
         val path = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.absolutePath
 
         val pathToImg = "$path/$itemId.jpg"
@@ -127,19 +137,22 @@ class BookEditFragment : Fragment() {
         }
     }
 
+    // enable back button
     private fun toolbarSetup() {
         if (activity is MainActivity) {
-            // add back button
             (activity as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
     }
 
+
     private fun setupViewModel() {
         viewModel = ViewModelProviders.of(this).get(BookEditViewModel::class.java)
+
         viewModel.fetching.observe(this, Observer { fetching ->
             Log.v(TAG, "update fetching")
             progresse.visibility = if (fetching) View.VISIBLE else View.GONE
         })
+
         viewModel.fetchingError.observe(this, Observer { exception ->
             if (exception != null) {
                 Log.v(TAG, "update fetching error")
@@ -150,12 +163,14 @@ class BookEditFragment : Fragment() {
                 }
             }
         })
+
         viewModel.completed.observe(this, Observer { completed ->
             if (completed) {
                 Log.v(TAG, "completed, navigate back")
                 findNavController().popBackStack()
             }
         })
+
         val id = itemId
 
         if (id == null) {
@@ -169,8 +184,7 @@ class BookEditFragment : Fragment() {
                     book_title.setText(it.title)
                     book_author.setText(it.author)
 
-                    // spinner default selected item
-
+                    // set spinner default selected item
                     val booksgene = resources.getStringArray(R.array.bookgene)
                     var index = booksgene.indexOf(it.gene)
 
@@ -184,7 +198,9 @@ class BookEditFragment : Fragment() {
     }
 
 
-    ////////////////////////////////// CAMERA ////////////////////////////////////////////
+    ////////////////////////////////// CAMERA ////////////////////////////////////////
+
+    private val REQUEST_TAKE_PHOTO = 1
 
     private fun takePicture() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -208,22 +224,25 @@ class BookEditFragment : Fragment() {
         }
     }
 
-    lateinit var photoPath: String
 
+    // create create file in internal storage for image
+    // image name is its ID followed by .jpg extension
     private fun createImageFile(): File? {
-        val fileName = itemId
         val storageDir = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val image = File(storageDir, "$fileName.jpg")
+        val image = File(storageDir, "$itemId.jpg")
+
         photoPath = image.absolutePath
-        Log.v(TAG, "Path TRUE: $photoPath")
+        Log.v(TAG, "Image path: $photoPath")
+
         return image
     }
 
-    //    /storage/emulated/0/Android/data/com.example.firstapp/files/Pictures/MyPicture3928423606804540189.jpg
-//    /storage/emulated/0/Android/data/com.example.firstapp/files/Pictures/MyPicture.jpg
+    // set image URI to ImageView
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
             image_view_edit.setImageURI(Uri.parse(photoPath))
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
 }

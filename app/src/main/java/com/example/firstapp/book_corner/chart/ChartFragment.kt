@@ -32,53 +32,53 @@ class ChartFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         toolbarSetup();
-        setHasOptionsMenu(true);
-        return inflater.inflate(com.example.firstapp.R.layout.chart_fragment, container, false)
+        setHasOptionsMenu(true)
+
+        return inflater.inflate(R.layout.chart_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         setupChart()
     }
 
+    // hide chart icon from toolbar
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.action_chart).setVisible(false)
         super.onPrepareOptionsMenu(menu)
     }
 
+    // to enable back button
     private fun toolbarSetup() {
         if (activity is MainActivity) {
-            // add back button
+
             (activity as MainActivity).getSupportActionBar()?.setDisplayHomeAsUpEnabled(true)
-            (activity as MainActivity)
         }
     }
 
     private fun setupChart() {
         Log.v(TAG, "On setup chart")
-
         viewModel = ViewModelProviders.of(this).get(ChartViewModel::class.java)
-
 
         val booksgene = resources.getStringArray(R.array.bookgene)
 
         viewModel.items.observe(this, Observer { items ->
-            Log.v(TAG, "i get items!")
-
+            Log.v(TAG, "I receive data for chart!")
             val entries = viewModel.getPieEntries(booksgene)
 
             drawChart(entries);
-            val size = entries.size
-            Log.v(TAG, "Size of list for chart $size")
         })
 
 
     }
 
     private fun drawChart(entries: List<PieEntry>?) {
+        // set chart data
         val set = PieDataSet(entries, "Genes")
+
+        // chart colors
         val colors = java.util.ArrayList<Int>();
         colors.add(Color.rgb(155, 191, 224))
         colors.add(Color.rgb(232, 160, 154))
@@ -88,8 +88,10 @@ class ChartFragment : Fragment() {
 
         val data = PieData(set)
 
+        // chart customization
         data.setValueTextSize(12f)
         data.setValueTextColor(Color.BLACK)
+
         pieChartView.data = data
 
         pieChartView.description.textSize = 50f
@@ -102,5 +104,4 @@ class ChartFragment : Fragment() {
 
         pieChartView.invalidate() // refresh
     }
-
 }

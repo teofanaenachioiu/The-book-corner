@@ -22,9 +22,11 @@ import kotlinx.android.synthetic.main.book_list_fragment.*
 import com.example.firstapp.core.TAG;
 
 class BookListFragment : Fragment() {
+
     private lateinit var itemListAdapter: BookListAdapter
     private lateinit var itemListModel: BookListViewModel
 
+    // we use this property to check Internet connection
     val Context.isConnected: Boolean
         get() {
             return (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
@@ -41,12 +43,15 @@ class BookListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
         Log.v(TAG, "onActivityCreated")
+
         (activity as AppCompatActivity).supportActionBar?.show()
 
         setupItemList()
+
         fab.setOnClickListener {
-            Log.v(TAG, "add new item")
+            Log.v(TAG, "navigate from items list to add item")
             findNavController().navigate(R.id.item_edit_fragment)
         }
     }
@@ -61,10 +66,12 @@ class BookListFragment : Fragment() {
             Log.v(TAG, "update items")
             itemListAdapter.items = items
         })
+
         itemListModel.loading.observe(this, Observer { loading ->
             Log.v(TAG, "update loading")
             progress.visibility = if (loading) View.VISIBLE else View.GONE
         })
+
         itemListModel.loadingError.observe(this, Observer { exception ->
             if (exception != null) {
                 Log.v(TAG, "update loading error")
@@ -75,12 +82,15 @@ class BookListFragment : Fragment() {
                 }
             }
         })
+
+        // check for internet connection
+        // refresh list only if there is internet connection
         if (context!!.isConnected) {
-            Log.v(TAG, "internet connection in book list fragment. Read from server")
+            Log.v(TAG, "There is internet connection: Load data from server")
             itemListModel.refresh()
         } else {
             Toast.makeText(context, "Read from local database", Toast.LENGTH_SHORT).show()
-            Log.v(TAG, "no internet connection in book list fragment. Read from local database")
+            Log.v(TAG, "There is no internet connection: Load data from local database")
             itemListAdapter.items = itemListModel.items.value!!
         }
     }

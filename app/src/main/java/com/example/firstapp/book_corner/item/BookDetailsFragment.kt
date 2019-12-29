@@ -34,7 +34,6 @@ import kotlinx.android.synthetic.main.book_details_fragment.*
 import kotlinx.android.synthetic.main.book_details_fragment.book_author
 import kotlinx.android.synthetic.main.book_details_fragment.book_title
 import kotlinx.android.synthetic.main.book_details_fragment.progresse
-import kotlinx.android.synthetic.main.book_edit_fragment.*
 import java.io.File
 
 class BookDetailsFragment : Fragment() {
@@ -47,9 +46,7 @@ class BookDetailsFragment : Fragment() {
     private var item: Book? = null
 
 
-    //////////////////////////////////// FAB //////////////////////////////////////
-    var isOpen = false;
-    ///////////////////////////////////////////////////////////////////////////////////
+    var isFabOpen = false;
 
 
     /////////////////////////////////// IMAGE /////////////////////////////////////////
@@ -84,15 +81,14 @@ class BookDetailsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(BookDetailsViewModel::class.java)
         Log.v(TAG, "onActivityCreated")
-        setupViewModel()
 
-        /////////////////////////////// FAB //////////////////////////
+        setupViewModel()
 
         val fab_close = AnimationUtils.loadAnimation(context?.applicationContext, R.anim.fab_close);
         val fab_open = AnimationUtils.loadAnimation(context?.applicationContext, R.anim.fab_open);
 
         fabb.setOnClickListener {
-            isOpen = if (isOpen) {
+            isFabOpen = if (isFabOpen) {
 
                 fab_edit.startAnimation(fab_close);
                 fab_delete.startAnimation(fab_close);
@@ -110,14 +106,12 @@ class BookDetailsFragment : Fragment() {
         }
 
         fab_edit.setOnClickListener {
-            Log.v(TAG, "edit item")
             findNavController().navigate(R.id.item_edit_fragment, Bundle().apply {
                 putString(BookEditFragment.ITEM_ID, itemId)
             })
         }
-        fab_delete.setOnClickListener {
-            Log.v(TAG, "delete item")
 
+        fab_delete.setOnClickListener {
             deleteItem()
         }
 
@@ -132,10 +126,12 @@ class BookDetailsFragment : Fragment() {
 
     private fun setupViewModel() {
         viewModel = ViewModelProviders.of(this).get(BookDetailsViewModel::class.java)
+
         viewModel.fetching.observe(this, Observer { fetching ->
             Log.v(TAG, "update fetching")
             progresse.visibility = if (fetching) View.VISIBLE else View.GONE
         })
+
         viewModel.fetchingError.observe(this, Observer { exception ->
             if (exception != null) {
                 Log.v(TAG, "update fetching error")
@@ -146,12 +142,14 @@ class BookDetailsFragment : Fragment() {
                 }
             }
         })
+
         viewModel.completed.observe(this, Observer { completed ->
             if (completed) {
                 Log.v(TAG, "completed, navigate back")
                 findNavController().popBackStack()
             }
         })
+
         val id = itemId
 
         if (id == null) {
@@ -184,7 +182,63 @@ class BookDetailsFragment : Fragment() {
     }
 
 
+    private fun deleteItem(): Boolean {
+
+        val builder = AlertDialog.Builder(context)
+
+        // Set the alert dialog title
+        builder.setTitle("Remove item")
+
+        // Display a message on alert dialog
+        builder.setMessage("Do you want to remove this book?")
+
+        // Set a positive button and its click listener on alert dialog
+        builder.setPositiveButton("YES") { dialog, which ->
+            // Do something when user press the positive button
+            Toast.makeText(
+                context,
+                "Book has been removed.",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            // Delete item
+            Log.v(TAG, "Delete item")
+
+            viewModel.deleteItem(item!!._id)
+            findNavController().popBackStack()
+        }
+
+        // Display a negative button on alert dialog
+        builder.setNegativeButton("No") { dialog, which ->
+            Toast.makeText(
+                context,
+                "You are not agree.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+
+        // Display a neutral button on alert dialog
+        builder.setNeutralButton("Cancel") { _, _ ->
+            Toast.makeText(
+                context,
+                "You cancelled the dialog.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        // Finally, make the alert dialog using builder
+        val dialog: AlertDialog = builder.create()
+
+        // Display the alert dialog on app interface
+        dialog.show()
+
+        return true;
+    }
+
+
     //////////////////////////////////////// IMAGE ANIMATION ///////////////////////////
+
     private fun zoomImageFromThumb(
         thumbView: View,
         tableLayout: TableLayout,
@@ -340,65 +394,6 @@ class BookDetailsFragment : Fragment() {
                 }
             }
         }
-        ///////////////////////////////////////////////////////////////////////////////////
-
     }
-
-    private fun deleteItem(): Boolean {
-
-        Log.v(TAG, "delete item item $id")
-
-        val builder = AlertDialog.Builder(context)
-
-        // Set the alert dialog title
-        builder.setTitle("Remove item")
-
-        // Display a message on alert dialog
-        builder.setMessage("Do you want to remove this book?")
-
-        // Set a positive button and its click listener on alert dialog
-        builder.setPositiveButton("YES") { dialog, which ->
-            // Do something when user press the positive button
-            Toast.makeText(
-                context,
-                "Book has been removed.",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            // Change the app background color
-            Log.v(TAG, "notify delete item")
-
-            viewModel.deleteItem(item!!._id)
-//            findNavController().popBackStack()
-        }
-
-
-        // Display a negative button on alert dialog
-        builder.setNegativeButton("No") { dialog, which ->
-            Toast.makeText(
-                context,
-                "You are not agree.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-
-        // Display a neutral button on alert dialog
-        builder.setNeutralButton("Cancel") { _, _ ->
-            Toast.makeText(
-                context,
-                "You cancelled the dialog.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        // Finally, make the alert dialog using builder
-        val dialog: AlertDialog = builder.create()
-
-        // Display the alert dialog on app interface
-        dialog.show()
-
-        return true;
-    }
-
+    ///////////////////////////////////////////////////////////////////////////////////
 }

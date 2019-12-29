@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import com.example.firstapp.core.*;
 
 class BookListViewModel(application: Application) : AndroidViewModel(application) {
+
     private val mutableLoading = MutableLiveData<Boolean>().apply { value = false }
     private val mutableException = MutableLiveData<Exception>().apply { value = null }
 
@@ -17,25 +18,30 @@ class BookListViewModel(application: Application) : AndroidViewModel(application
     val loading: LiveData<Boolean> = mutableLoading
     val loadingError: LiveData<Exception> = mutableException
 
-    val itemRepository: BookRepository
+    val bookRepository: BookRepository
 
+    // we init the list items using items from repository
     init {
         val itemDao = BookDatabase.getDatabase(application, viewModelScope).itemDao()
-        itemRepository = BookRepository(itemDao)
-        items = itemRepository.items
+        bookRepository = BookRepository(itemDao)
+        items = bookRepository.items
     }
 
+    // we call this function when we want to refresh items from list
     fun refresh() {
         viewModelScope.launch {
-            Log.v(TAG, "refresh...");
+
+            Log.v(TAG, "refresh items from list...");
+
             mutableLoading.value = true
             mutableException.value = null
-            when (val result = itemRepository.refresh()) {
+
+            when (val result = bookRepository.refresh()) {
                 is Result.Success -> {
-                    Log.d(TAG, "refresh succeeded");
+                    Log.d(TAG, "refresh items succeeded");
                 }
                 is Result.Error -> {
-                    Log.w(TAG, "refresh failed", result.exception);
+                    Log.w(TAG, "refresh items failed", result.exception);
                     mutableException.value = result.exception
                 }
             }
