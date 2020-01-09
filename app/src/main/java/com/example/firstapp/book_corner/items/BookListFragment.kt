@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.firstapp.R
+import com.example.firstapp.book_corner.item.BookEditFragment
 import com.example.firstapp.core.Api
 import com.example.firstapp.core.ConnectivityReceiver
 import kotlinx.android.synthetic.main.book_list_fragment.*
@@ -52,7 +53,9 @@ class BookListFragment : Fragment() {
 
         fab.setOnClickListener {
             Log.v(TAG, "navigate from items list to add item")
-            findNavController().navigate(R.id.item_edit_fragment)
+            findNavController().navigate(R.id.item_edit_fragment, Bundle().apply {
+                putString(BookEditFragment.WINDOW_NAME, "New book")
+            })
         }
     }
 
@@ -75,10 +78,9 @@ class BookListFragment : Fragment() {
         itemListModel.loadingError.observe(this, Observer { exception ->
             if (exception != null) {
                 Log.v(TAG, "update loading error")
-                val message = "Loading exception ${exception.message}"
-                val parentActivity = activity?.parent
+                val parentActivity = this.context?.applicationContext
                 if (parentActivity != null) {
-                    Toast.makeText(parentActivity, message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(parentActivity, "Server error - loading items", Toast.LENGTH_SHORT).show()
                 }
             }
         })

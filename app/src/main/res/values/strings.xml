@@ -16,7 +16,7 @@
     <string name="author">Author</string>
     <string name="gene">Gene</string>
     <string name="action_chart">Chart</string>
-    <string name="items_chart">Items chart</string>
+    <string name="items_chart">Books gene chart</string>
     <string name="description_zoom_touch_close">Description zoom touch close</string>
 
     <string-array name="bookgene">

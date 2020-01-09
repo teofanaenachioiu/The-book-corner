@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -32,11 +33,13 @@ import java.io.File
 class BookEditFragment : Fragment() {
     companion object {
         const val ITEM_ID = "ITEM_ID"
+        const val WINDOW_NAME = "WINDOW_NAME"
     }
 
     private lateinit var viewModel: BookEditViewModel
     private lateinit var photoPath: String
     private var itemId: String? = null
+    private var windowName: String? = null
     private var item: Book? = null
 
     // we use this property to check Internet connection
@@ -53,6 +56,9 @@ class BookEditFragment : Fragment() {
             if (it.containsKey(ITEM_ID)) {
                 itemId = it.getString(ITEM_ID).toString()
             }
+            if (it.containsKey(WINDOW_NAME)) {
+                windowName = it.getString(WINDOW_NAME).toString()
+            }
         }
     }
 
@@ -67,6 +73,8 @@ class BookEditFragment : Fragment() {
         toolbarSetup();
         setHasOptionsMenu(true);
 
+        // custom title for fragment
+        (activity as AppCompatActivity).supportActionBar?.title = windowName;
         return inflater.inflate(R.layout.book_edit_fragment, container, false)
     }
 
@@ -156,10 +164,9 @@ class BookEditFragment : Fragment() {
         viewModel.fetchingError.observe(this, Observer { exception ->
             if (exception != null) {
                 Log.v(TAG, "update fetching error")
-                val message = "Fetching exception ${exception.message}"
-                val parentActivity = activity?.parent
+                val parentActivity = this.context?.applicationContext
                 if (parentActivity != null) {
-                    Toast.makeText(parentActivity, message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(parentActivity, "Server error", Toast.LENGTH_SHORT).show()
                 }
             }
         })

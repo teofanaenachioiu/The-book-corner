@@ -34,6 +34,7 @@ class BookListAdapter(private val fragment: Fragment) :
 
             fragment.findNavController().navigate(R.id.item_details_fragment, Bundle().apply {
                 putString(BookDetailsFragment.ITEM_ID, item._id)
+                putString(BookDetailsFragment.WINDOW_NAME, item.title)
             })
         }
     }

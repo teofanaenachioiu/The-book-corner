@@ -32,7 +32,6 @@
     <fragment
         android:id="@+id/item_edit_fragment"
         android:name="com.example.firstapp.book_corner.item.BookEditFragment"
-        android:label="@string/item_edit"
         tools:layout="@layout/book_edit_fragment" />
 
 </navigation>

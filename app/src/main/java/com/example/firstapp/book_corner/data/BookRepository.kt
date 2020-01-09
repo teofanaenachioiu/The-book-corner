@@ -11,27 +11,19 @@ import com.example.firstapp.book_corner.data.remote.BookApi
 class BookRepository(private val itemDao: ItemDao) {
     var items = itemDao.getAll()
 
-    init {
-        println("S-a initializat repoul")
-        WebSocketProvider.initRepo(this)
-    }
+//    init {
+//        println("S-a initializat repoul")
+//        WebSocketProvider.initRepo(this)
+//    }
 
     suspend fun refresh(): Result<Boolean> {
         try {
             if (AuthRepository.isLoggedIn) {
                 Log.v(TAG, "User logged in")
                 Log.v(TAG, "Get all items from server")
-                val items = BookApi.service.findByUser(AuthRepository.user!!.username)
-                Log.v(TAG, "Done with loading items from server")
-                itemDao.deleteAll();
-                for (item in items) {
-                    itemDao.insert(item)
-                }
-            } else {
-                Log.v(TAG, "User is not logged in")
-                Log.v(TAG, "Get all items from server")
                 val items = BookApi.service.find()
                 Log.v(TAG, "Done with loading items from server")
+                itemDao.deleteAll();
                 for (item in items) {
                     itemDao.insert(item)
                 }
@@ -52,9 +44,9 @@ class BookRepository(private val itemDao: ItemDao) {
         return try {
             val createdItem = BookApi.service.create(item)
             itemDao.insert(createdItem)
-//            WebSocketProvider.updated()
             Result.Success(createdItem)
         } catch (e: Exception) {
+            Log.v(TAG, "Eroare la save")
             Result.Error(e)
         }
     }
@@ -63,7 +55,6 @@ class BookRepository(private val itemDao: ItemDao) {
         return try {
             val updatedItem = BookApi.service.update(item)
             itemDao.update(updatedItem)
-//            WebSocketProvider.updated()
             Result.Success(updatedItem)
         } catch (e: Exception) {
             Result.Error(e)

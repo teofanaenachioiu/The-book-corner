@@ -11,9 +11,6 @@ object BookApi {
         @GET("/api/book")
         suspend fun find(): List<Book>
 
-        @GET("/api/book/user/{user}")
-        suspend fun findByUser(@Path("user") user: String): List<Book>
-
         @GET("/api/book/{_id}")
         suspend fun read(@Path("_id") itemId: String): Book;
 

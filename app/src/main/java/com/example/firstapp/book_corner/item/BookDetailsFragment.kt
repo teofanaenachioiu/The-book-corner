@@ -23,6 +23,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TableLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.firstapp.MainActivity
@@ -39,10 +40,12 @@ import java.io.File
 class BookDetailsFragment : Fragment() {
     companion object {
         const val ITEM_ID = "ITEM_ID"
+        const val WINDOW_NAME = "WINDOW_NAME"
     }
 
     private lateinit var viewModel: BookDetailsViewModel
     private var itemId: String? = null
+    private var windowName: String? = null
     private var item: Book? = null
 
 
@@ -66,6 +69,9 @@ class BookDetailsFragment : Fragment() {
             if (it.containsKey(ITEM_ID)) {
                 itemId = it.getString(ITEM_ID).toString()
             }
+            if (it.containsKey(BookEditFragment.WINDOW_NAME)) {
+                windowName = it.getString(BookEditFragment.WINDOW_NAME).toString()
+            }
         }
     }
 
@@ -74,6 +80,10 @@ class BookDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.v(TAG, "onCreateView")
+
+        // custom title for fragment
+        (activity as AppCompatActivity).supportActionBar?.title = windowName;
+
         return inflater.inflate(R.layout.book_details_fragment, container, false)
     }
 
@@ -108,18 +118,20 @@ class BookDetailsFragment : Fragment() {
         fab_edit.setOnClickListener {
             findNavController().navigate(R.id.item_edit_fragment, Bundle().apply {
                 putString(BookEditFragment.ITEM_ID, itemId)
+                putString(BookEditFragment.WINDOW_NAME, item?.title)
             })
         }
+
+        setAvatar()
 
         fab_delete.setOnClickListener {
             deleteItem()
         }
 
         thumb_button_1.setOnClickListener {
-            zoomImageFromThumb(thumb_button_1, tableLayoutDetails, fabs, R.drawable.book)
+            zoomImageFromThumb(thumb_button_1, tableLayoutDetails, fabs)
         }
 
-        setAvatar()
 
         shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
     }
@@ -135,10 +147,9 @@ class BookDetailsFragment : Fragment() {
         viewModel.fetchingError.observe(this, Observer { exception ->
             if (exception != null) {
                 Log.v(TAG, "update fetching error")
-                val message = "Fetching exception ${exception.message}"
-                val parentActivity = activity?.parent
+                val parentActivity = this.context?.applicationContext
                 if (parentActivity != null) {
-                    Toast.makeText(parentActivity, message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(parentActivity, "Server error", Toast.LENGTH_SHORT).show()
                 }
             }
         })
@@ -169,7 +180,7 @@ class BookDetailsFragment : Fragment() {
     }
 
 
-    private fun setAvatar(){
+    private fun setAvatar() {
         val path = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.absolutePath
 
         val pathToImg = "$path/$itemId.jpg"
@@ -202,10 +213,15 @@ class BookDetailsFragment : Fragment() {
             ).show()
 
             // Delete item
-            Log.v(TAG, "Delete item")
+            Log.v(TAG, "Delete item with id: " + item!!._id);
 
             viewModel.deleteItem(item!!._id)
-            findNavController().popBackStack()
+            viewModel.completed.observe(this, Observer { completed ->
+                if (completed) {
+                    Log.v(TAG, "completed, navigate back")
+                    findNavController().popBackStack()
+                }
+            })
         }
 
         // Display a negative button on alert dialog
@@ -242,8 +258,7 @@ class BookDetailsFragment : Fragment() {
     private fun zoomImageFromThumb(
         thumbView: View,
         tableLayout: TableLayout,
-        fabs: RelativeLayout,
-        imageResId: Int
+        fabs: RelativeLayout
     ) {
         if (activity is MainActivity) {
             // If there's an animation in progress, cancel it
@@ -253,7 +268,7 @@ class BookDetailsFragment : Fragment() {
             // Load the high-resolution "zoomed-in" image.
             val expandedImageView: ImageView =
                 (activity as MainActivity).findViewById(R.id.expanded_image)
-            expandedImageView.setImageResource(imageResId)
+//            expandedImageView.setImageResource(imageResId)
 
             // Calculate the starting and ending bounds for the zoomed-in image.
             // This step involves lots of math. Yay, math.
