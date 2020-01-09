@@ -8,10 +8,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.firstapp.book_corner.data.BookRepository
+import com.example.firstapp.book_corner.data.local.BookDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import com.example.firstapp.core.*;
 import com.google.android.material.snackbar.Snackbar
@@ -78,8 +81,6 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
     }
 
     private fun showMessage(isConnected: Boolean) {
-
-
         if (!isConnected) {
 
             if (mSnackBar != null) {
@@ -92,6 +93,7 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
                 messageToUser,
                 Snackbar.LENGTH_LONG
             ) //Assume "rootLayout" as the root layout of every activity.
+
             mSnackBar?.duration = 3000
             mSnackBar?.show()
         } else {
@@ -99,6 +101,8 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
                 mSnackBar?.dismiss()
             }
             val messageToUser = "You are online now." //TODO
+
+//            BookRepository.checkDifferences();
 
             mSnackBar = Snackbar.make(
                 findViewById(R.id.rootLayout),

@@ -11,6 +11,11 @@ import com.example.firstapp.book_corner.data.remote.BookApi
 class BookRepository(private val itemDao: ItemDao) {
     var items = itemDao.getAll()
 
+    init {
+        println("S-a initializat repoul")
+        WebSocketProvider.initRepo(this)
+    }
+
     suspend fun refresh(): Result<Boolean> {
         try {
             if (AuthRepository.isLoggedIn) {
@@ -18,6 +23,7 @@ class BookRepository(private val itemDao: ItemDao) {
                 Log.v(TAG, "Get all items from server")
                 val items = BookApi.service.findByUser(AuthRepository.user!!.username)
                 Log.v(TAG, "Done with loading items from server")
+                itemDao.deleteAll();
                 for (item in items) {
                     itemDao.insert(item)
                 }
@@ -37,6 +43,7 @@ class BookRepository(private val itemDao: ItemDao) {
         }
     }
 
+
     fun getById(itemId: String): LiveData<Book> {
         return itemDao.getById(itemId)
     }
@@ -45,6 +52,7 @@ class BookRepository(private val itemDao: ItemDao) {
         return try {
             val createdItem = BookApi.service.create(item)
             itemDao.insert(createdItem)
+//            WebSocketProvider.updated()
             Result.Success(createdItem)
         } catch (e: Exception) {
             Result.Error(e)
@@ -55,6 +63,7 @@ class BookRepository(private val itemDao: ItemDao) {
         return try {
             val updatedItem = BookApi.service.update(item)
             itemDao.update(updatedItem)
+//            WebSocketProvider.updated()
             Result.Success(updatedItem)
         } catch (e: Exception) {
             Result.Error(e)
@@ -65,11 +74,10 @@ class BookRepository(private val itemDao: ItemDao) {
         return try {
             val isDelete = BookApi.service.delete(id)
 
-            if(isDelete){
+            if (isDelete) {
                 itemDao.delete(id);
                 Result.Success(true)
-            }
-            else{
+            } else {
                 Result.Success(false)
             }
 
@@ -77,4 +85,12 @@ class BookRepository(private val itemDao: ItemDao) {
             Result.Error(e)
         }
     }
+
+    suspend fun refreshLocally(books: List<Book>) {
+        itemDao.deleteAll()
+        for (book in books) {
+            itemDao.insert(book)
+        }
+    }
+
 }

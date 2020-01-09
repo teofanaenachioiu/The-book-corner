@@ -53,8 +53,6 @@ abstract class BookDatabase : RoomDatabase() {
 
         suspend fun populateDatabase(itemDao: ItemDao) {
             itemDao.deleteAll()
-//            val item = Book("", "Hello")
-//            itemDao.insert(item)
         }
     }
 
